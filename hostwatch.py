@@ -51,15 +51,20 @@ def read_host_cache():
         words = line.strip().split(',')
         if len(words) == 2:
             (name,ip) = words
-            name = re.sub(r'[^-\w]', '-', name).strip()
+            name = re.sub(r'[^-\w\.]', '-', name).strip()
             ip = re.sub(r'[^0-9.]', '', ip).strip()
             if name and ip:
                 found_host(name, ip)
-                
 
-def found_host(hostname, ip):
-    hostname = re.sub(r'\..*', '', hostname)
-    hostname = re.sub(r'[^-\w]', '_', hostname)
+
+def found_host(full_hostname, ip):
+    full_hostname = re.sub(r'[^-\w\.]', '_', full_hostname)
+    hostname = re.sub(r'\..*', '', full_hostname)
+    _insert_host(full_hostname, ip)
+    _insert_host(hostname, ip)
+
+
+def _insert_host(hostname, ip):
     if (ip.startswith('127.') or ip.startswith('255.') 
         or hostname == 'localhost'):
         return

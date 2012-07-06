@@ -430,6 +430,19 @@ def restore_etc_hosts(port):
     rewrite_etc_hosts(port)
 
 
+def _mask(ip, width):
+    nip = struct.unpack('!I', socket.inet_aton(ip))[0]
+    masked = nip & shl(shl(1, width) - 1, 32-width)
+    return socket.inet_ntoa(struct.pack('!I', masked))
+
+
+def ip_in_subnets(ip, subnets):
+    for swidth,sexclude,snet in sorted(subnets, reverse=True):
+        if _mask(snet, swidth) == _mask(ip, swidth):
+            return not sexclude
+    return False
+
+
 # This is some voodoo for setting up the kernel's transparent
 # proxying stuff.  If subnets is empty, we just delete our sshuttle rules;
 # otherwise we delete it, then make them from scratch.
@@ -521,8 +534,9 @@ def main(port, dnsport, syslog):
             line = sys.stdin.readline(128)
             if line.startswith('HOST '):
                 (name,ip) = line[5:].strip().split(',', 1)
-                hostmap[name] = ip
-                rewrite_etc_hosts(port)
+                if ip_in_subnets(ip, subnets):
+                    hostmap[name] = ip
+                    rewrite_etc_hosts(port)
             elif line:
                 raise Fatal('expected EOF, got %r' % line)
             else:
