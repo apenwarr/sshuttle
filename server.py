@@ -37,20 +37,11 @@ def _maskbits(netmask):
     if not netmask:
         return 32
     for i in range(32):
-        if netmask[0] & _shl(1, i):
+        if netmask[0] & shl(1, i):
             return 32-i
     return 0
     
     
-def _shl(n, bits):
-    # we use our own implementation of left-shift because
-    # results may be different between older and newer versions
-    # of python for numbers like 1<<32.  We use long() because
-    # int(2**32) doesn't work in older python, which has limited
-    # int sizes.
-    return n * long(2**bits)
-
-
 def _list_routes():
     argv = ['netstat', '-rn']
     p = ssubprocess.Popen(argv, stdout=ssubprocess.PIPE)
@@ -63,7 +54,7 @@ def _list_routes():
         maskw = _ipmatch(cols[2])  # linux only
         mask = _maskbits(maskw)   # returns 32 if maskw is null
         width = min(ipw[1], mask)
-        ip = ipw[0] & _shl(_shl(1, width) - 1, 32-width)
+        ip = ipw[0] & shl(shl(1, width) - 1, 32-width)
         routes.append((socket.inet_ntoa(struct.pack('!I', ip)), width))
     rv = p.wait()
     if rv != 0:

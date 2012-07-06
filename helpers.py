@@ -78,3 +78,10 @@ def islocal(ip):
     return True  # it's a local IP, or there would have been an error
 
 
+def shl(n, bits):
+    # we use our own implementation of left-shift because
+    # results may be different between older and newer versions
+    # of python for numbers like 1<<32.  We use long() because
+    # int(2**32) doesn't work in older python, which has limited
+    # int sizes.
+    return n * long(2**bits)
