@@ -77,6 +77,10 @@ This is how you use it:
    The above is probably what you want to use to prevent
    local network attacks such as Firesheep and friends.
 
+ - OR if you have MacOS and want to try the GUI version:
+        make
+        open ui-macos/Sshuttle*.app
+
 (You may be prompted for one or more passwords; first, the
 local password to become root using either sudo or su, and
 then the remote ssh password.  Or you might have sudo and ssh set
